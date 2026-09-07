@@ -1,0 +1,6 @@
+customer_id,gender,age,region,customer_segment,contract_type,tenure_months,monthly_fee,total_spent,internet_service,tv_service,streaming_service,support_calls,complaints,payment_method,last_payment_delay,digital_usage_score,marketing_score,preferred_contact_hour
+NT-000001,Femenino,32.0,Sur,Masivo,Bianual,27,101.65,2467.19,Fibra,No,Sí,0,0,Efectivo,3,80.4,91.0,15
+NT-000002,Masculino,31.0,Lima,Familia,Anual,17,105.62,1674.51,Fibra,No,No,1,1,Débito automático,2,71.7,73.8,15
+NT-000003,Femenino,18.0,,Familia,Bianual,20,64.51,1140.26,DSL,No,Sí,5,1,Débito automático,1,42.2,61.0,18
+NT-000004,Femenino,33.0,Centro,Joven digital,Mensual,20,35.0,559.87,Sin internet,No,No,3,0,Débito automático,4,70.7,62.5,9
+NT-000005,Femenino,43.0,Centro,Familia,Mensual,71,105.12,6761.04,DSL,Sí,Sí,1,1,Tarjeta,17,63.8,60.0,17
