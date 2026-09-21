@@ -7,6 +7,7 @@ from fastapi.responses import Response, StreamingResponse
 from prometheus_client import (
     CONTENT_TYPE_LATEST,
     Counter,
+    Gauge,
     Histogram,
     generate_latest,
 )
@@ -39,6 +40,41 @@ PREDICTIONS_TOTAL = Counter(
 PREDICTION_LATENCY = Histogram(
     "churn_prediction_latency_seconds",
     "Latency of individual churn predictions",
+)
+
+CHURN_PROBABILITY = Histogram(
+    "churn_probability",
+    "Distribution of predicted churn probability",
+    buckets=(0.1, 0.25, 0.5, 0.75, 0.9, 1.0),
+)
+
+INPUT_MONTHLY_FEE = Histogram(
+    "churn_input_monthly_fee",
+    "Distribution of monthly fee received by the model",
+    buckets=(40, 60, 80, 100, 120, 150, 200),
+)
+
+INPUT_SUPPORT_CALLS = Histogram(
+    "churn_input_support_calls",
+    "Distribution of support calls received by the model",
+    buckets=(0, 1, 2, 3, 5, 8, 12),
+)
+
+INPUT_PAYMENT_DELAY = Histogram(
+    "churn_input_payment_delay_days",
+    "Distribution of last payment delay received by the model",
+    buckets=(0, 3, 7, 15, 30, 60, 90),
+)
+
+INPUT_DIGITAL_USAGE = Histogram(
+    "churn_input_digital_usage_score",
+    "Distribution of digital usage score received by the model",
+    buckets=(1, 2, 4, 6, 8, 10),
+)
+
+LAST_CHURN_PROBABILITY = Gauge(
+    "churn_last_probability",
+    "Churn probability from the most recent prediction",
 )
 
 
@@ -95,6 +131,26 @@ def predict(customer: CustomerInput):
             prediction=str(prediction)
         ).inc()
 
+        probability = float(
+            row["churn_probability"]
+        )
+
+        CHURN_PROBABILITY.observe(probability)
+        LAST_CHURN_PROBABILITY.set(probability)
+
+        INPUT_MONTHLY_FEE.observe(
+            customer.monthly_fee
+        )
+        INPUT_SUPPORT_CALLS.observe(
+            customer.support_calls
+        )
+        INPUT_PAYMENT_DELAY.observe(
+            customer.last_payment_delay
+        )
+        INPUT_DIGITAL_USAGE.observe(
+            customer.digital_usage_score
+        )
+
         PREDICTION_LATENCY.observe(
             perf_counter() - start_time
         )
@@ -105,9 +161,7 @@ def predict(customer: CustomerInput):
                 if "customer_id" in result.columns
                 else None
             ),
-            churn_probability=float(
-                row["churn_probability"]
-            ),
+            churn_probability=probability,
             churn_prediction=prediction,
         )
 
